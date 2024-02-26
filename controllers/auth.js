@@ -22,6 +22,9 @@ exports.register = async (req, res, next) => {
   }
 };
 
+//desc    Login user
+//route   POST /api/project/auth/login
+//access  Private
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -82,27 +85,12 @@ exports.getMe = async (req, res, next) => {
   });
 };
 
-// Not complete
+//desc    Logout user
+//route   POST /api/project/auth/logout
+//access  Private
 exports.logout = async (req, res, next) => {
-  // const { email, password } = req.body;
-  // // Validate email & password
-  // if (!email || !password) {
-  //   return res
-  //     .status(400)
-  //     .json({ success: false, msg: "Please provide an email and password" });
-  // }
-  // // Check for user
-  // const user = await User.findOne({ email }).select("+password");
-  // if (!user) {
-  //   return res.status(400).json({ success: false, msg: "Invalid credentials" });
-  // }
-  // // Check if password matches
-  // const isMatch = await user.matchPassword(password);
-  // if (!isMatch) {
-  //   return res.status(401).json({ success: false, msg: "Invalid credentials" });
-  // }
-  // // Create token
-  // // const token = user.getSignedJwtToken();
-  // // res.status(200).json({ success: true, token });
-  // sendTokenResponse(user, 200, res);
+  // Clear the token from the client-side storage (e.g., localStorage)
+  res.clearCookie("token"); // Clears the token cookie
+
+  res.status(200).json({ success: true, msg: "Logged out successfully" });
 };
