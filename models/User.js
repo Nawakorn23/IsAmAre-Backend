@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema({
   },
   telephone: {
     type: String,
-    required: [true, "Please add a postslcode"],
+    required: [true, "Please add a telephone"],
     // maxlength: [10, "Postal Code can not be more than 10 digits"],
   },
   email: {

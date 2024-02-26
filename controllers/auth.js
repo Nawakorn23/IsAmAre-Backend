@@ -1,16 +1,15 @@
-// controllers/auth.js
 const User = require("../models/User");
 const { options } = require("../routes/coworkings");
 
 //desc    Register user
-//route   POST /api/v1/auth/register
+//route   POST /api/coworking/auth/register
 //access  Public
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, telephone, password, role } = req.body;
 
     // Create user
-    const user = await User.create({ name, email, password, role });
+    const user = await User.create({ name, email, telephone, password, role });
 
     // Create token
     // const token = user.getSignedJwtToken();
@@ -73,7 +72,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 };
 
 //desc    Get current Logged in user
-//route   POST /api/v1/auth/me
+//route   POST /api/project/auth/me
 //access  Private
 exports.getMe = async (req, res, next) => {
   const user = await User.findById(req.user.id);
