@@ -22,5 +22,3 @@ router
   .delete(protect, authorize("admin", "user"), deleteAppointment);
 
 module.exports = router;
-
-// protect, authorize("admin", "user")
