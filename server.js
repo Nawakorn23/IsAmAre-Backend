@@ -2,6 +2,12 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const cookieParser = require("cookie-parser");
+const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require('helmet');
+const {xss} = require('express-xss-sanitizer');
+const rateLimit=require('express-rate-limit');
+const hpp = require('hpp');
+const cors=require('cors');
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -18,6 +24,29 @@ const app = express();
 
 // Body parser
 app.use(express.json());
+
+const swaggerDocs=swaggerJsDoc(swaggerOptions);
+app.use('/api-docs',swaggerUI.serve,swaggerUI.setup(swaggerDocs));
+//Rate Limiting
+const limiter=rateLimit({
+   windowsMs:10*60*1000,//10 mins
+   max: 100
+   });
+
+//Sanitize data
+app.use(mongoSanitize());
+
+//Set security headers
+app.use(helmet());
+
+//Prevent XSS attacks
+app.use(xss());
+
+//Enable CORS
+app.use(cors());
+
+//Prevent http param pollutions
+app.use(hpp());
 
 // Cookie parser
 app.use(cookieParser());
