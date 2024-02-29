@@ -89,13 +89,13 @@ exports.addAppointment = async (req, res, next) => {
       });
     }
 
-    const startReservation = await Appointment.find({start: req.body.start});
+    const startReservation = await Appointment.find({apptDate: req.body.apptDate});
     const endReservation = await Appointment.find({end: req.body.end});
 
-    if (startReservation < req.body.coworking.openTime || endReservation > req.body.coworking.closeTime) {
+    if (startReservation < coworking.openTime || (endReservation.localeCompare(coworking.closetime) >= 0)) {
       return res.status(400).json({
         success: false,
-        message: `Please make reservation within ${req.body.coworking.openTime} to ${req.body.coworking.closeTime}`,
+        message: `Please make reservation within ${coworking.openTime} to ${coworking.closeTime}`,
       });
     }
 

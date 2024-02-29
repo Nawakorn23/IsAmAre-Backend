@@ -15,10 +15,10 @@ const AppointmentSchema = new mongoose.Schema({
     ref: "Coworking",
     required: true,
   },
-  start: {
+  /*start: {
     type: String,
     required: true
-  },
+  },*/
   end: {
     type: String,
     required: true
