@@ -4,6 +4,7 @@ const AppointmentSchema = new mongoose.Schema({
   apptDate: {
     type: Date,
     required: true,
+    default: () => new Date().setHours(0, 0, 0, 0)
   },
   user: {
     type: mongoose.Schema.ObjectId,
@@ -15,10 +16,10 @@ const AppointmentSchema = new mongoose.Schema({
     ref: "Coworking",
     required: true,
   },
-  /*start: {
+  start: {
     type: String,
     required: true
-  },*/
+  },
   end: {
     type: String,
     required: true

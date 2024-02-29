@@ -90,9 +90,9 @@ exports.addAppointment = async (req, res, next) => {
       });
     }
 
-    const start = req.body.apptDate.split('T')[1].split('.')[0];
+    //const start = req.body.apptDate.split('T')[1].split('.')[0];
     //console.log(coworking.closetime);
-    if (start.localeCompare(coworking.opentime) < 0 || (req.body.end.localeCompare(coworking.closetime) > 0)) {
+    if (req.body.start.localeCompare(coworking.opentime) < 0 || (req.body.end.localeCompare(coworking.closetime) > 0)) {
       return res.status(400).json({
         success: false,
         message: `Please make reservation within ${coworking.opentime} and ${coworking.closetime}`,
