@@ -89,6 +89,16 @@ exports.addAppointment = async (req, res, next) => {
       });
     }
 
+    const startReservation = await Appointment.find({start: req.body.start});
+    const endReservation = await Appointment.find({end: req.body.end});
+
+    if (startReservation < req.body.coworking.openTime || endReservation > req.body.coworking.closeTime) {
+      return res.status(400).json({
+        success: false,
+        message: `Please make reservation within ${req.body.coworking.openTime} to ${req.body.coworking.closeTime}`,
+      });
+    }
+
     const appointment = await Appointment.create(req.body);
     res.status(200).json({
       success: true,

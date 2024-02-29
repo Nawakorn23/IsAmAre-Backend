@@ -85,12 +85,16 @@ exports.getMe = async (req, res, next) => {
   });
 };
 
-//desc    Logout user
-//route   POST /api/project/auth/logout
+//desc    Log user out / clear cookie
+//route   GET /api/v1/auth/logout
 //access  Private
 exports.logout = async (req, res, next) => {
-  // Clear the token from the client-side storage (e.g., localStorage)
-  res.clearCookie("token"); // Clears the token cookie
-
-  res.status(200).json({ success: true, msg: "Logged out successfully" });
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    success: true,
+    data: {},
+  });
 };

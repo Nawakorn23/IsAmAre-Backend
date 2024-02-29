@@ -33,6 +33,14 @@ const CoworkingSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please add a region"],
     },
+    opentime: {
+      type: String,
+      required: true
+    },
+    closetime: {
+      type: String,
+      required: true
+    },
   },
   {
     toJSON: { virtuals: true },

@@ -15,6 +15,14 @@ const AppointmentSchema = new mongoose.Schema({
     ref: "Coworking",
     required: true,
   },
+  start: {
+    type: String,
+    required: true
+  },
+  end: {
+    type: String,
+    required: true
+  },
   createAt: {
     type: Date,
     default: Date.now,
