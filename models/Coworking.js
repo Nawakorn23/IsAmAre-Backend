@@ -34,7 +34,7 @@ const CoworkingSchema = new mongoose.Schema(
       required: [true, "Please add a region"],
     },
     opentime: {
-      type: Date,
+      type: String,
       required: true
     },
     closetime: {

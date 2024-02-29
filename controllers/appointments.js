@@ -75,6 +75,7 @@ exports.addAppointment = async (req, res, next) => {
         message: `No coworking with the id of ${req.params.coworkingId}`,
       });
     }
+
     // add user Id to req.body
     req.body.user = req.user.id;
 
@@ -89,10 +90,12 @@ exports.addAppointment = async (req, res, next) => {
       });
     }
 
-    if (req.body.apptDate < coworking.openTime || (req.body.end.localeCompare(coworking.closetime) >= 0)) {
+    const start = req.body.apptDate.split('T')[1].split('.')[0];
+    //console.log(coworking.closetime);
+    if (start.localeCompare(coworking.openTime) < 0 || (req.body.end.localeCompare(coworking.closetime) > 0)) {
       return res.status(400).json({
         success: false,
-        message: `Please make reservation within to ${req.body.coworking.closeTime}`,
+        message: `Please make reservation within ${coworking.opentime} and ${coworking.closetime}`,
       });
     }
 
