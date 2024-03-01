@@ -6,6 +6,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const {xss} = require('express-xss-sanitizer');
 const rateLimit=require('express-rate-limit');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUI = require('swagger-ui-express');
 const hpp = require('hpp');
 const cors=require('cors');
 
@@ -25,14 +27,32 @@ const app = express();
 // Body parser
 app.use(express.json());
 
-const swaggerDocs=swaggerJsDoc(swaggerOptions);
-app.use('/api-docs',swaggerUI.serve,swaggerUI.setup(swaggerDocs));
+const swaggerOptions={
+  swaggerDefinition:{
+     openapi: '3.0.0',
+     info: {
+        title: 'Library API',
+        version: '1.0.0',
+        description: 'A simple Epress VacQ API'
+     },
+     servers: [
+        {
+           url: 'http://localhost:5000/api/project'
+        }
+     ],
+  },
+  apis:['./routes/*.js'],
+};
+
+
 //Rate Limiting
 const limiter=rateLimit({
    windowsMs:10*60*1000,//10 mins
    max: 100
    });
 
+const swaggerDocs=swaggerJsDoc(swaggerOptions);
+app.use('/api-docs',swaggerUI.serve,swaggerUI.setup(swaggerDocs));
 //Sanitize data
 app.use(mongoSanitize());
 
