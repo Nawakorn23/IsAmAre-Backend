@@ -118,6 +118,10 @@ exports.logout = async (req, res, next) => {
 //@access       Private
 exports.updateMe = async (req, res, next) => {
   try {
+
+    if(req.body.role){
+      return res.status(400).json({ success: false,message:"false jaaa"});
+    }
     const user = await User.findByIdAndUpdate(
       req.user.id,
       req.body,
@@ -127,9 +131,10 @@ exports.updateMe = async (req, res, next) => {
       }
     );
 
-    if (!user) {
+    if (!user) {c
       return res.status(400).json({ success: false,message:"not user" });
     }
+    
 
     res.status(200).json({
       success: true,
