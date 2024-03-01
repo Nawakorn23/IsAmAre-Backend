@@ -26,14 +26,14 @@ exports.register = async (req, res, next) => {
 //route   POST /api/project/auth/login
 //access  Public
 exports.login = async (req, res, next) => {
-  try {  
+  try {
     const { email, password } = req.body;
 
     // Validate email & password
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Please provide an email and password"
+        message: "Please provide an email and password",
       });
     }
 
@@ -43,7 +43,7 @@ exports.login = async (req, res, next) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "Invalid credentials"
+        message: "Invalid credentials",
       });
     }
     // Check if password matches
@@ -52,7 +52,7 @@ exports.login = async (req, res, next) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials"
+        message: "Invalid credentials",
       });
     }
 
@@ -60,13 +60,13 @@ exports.login = async (req, res, next) => {
     // const token = user.getSignedJwtToken();
     // res.status(200).json({ success: true, token });
 
-    sendTokenResponse(user, 200, res);}
-    catch (err) {
-      return res.status(401).json({
-        success:false,
-        message: "Cannot convert email or password to string"
-      });
-    }
+    sendTokenResponse(user, 200, res);
+  } catch (err) {
+    return res.status(401).json({
+      success: false,
+      message: "Cannot convert email or password to string",
+    });
+  }
 };
 
 const sendTokenResponse = (user, statusCode, res) => {
@@ -84,7 +84,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 
   res.status(statusCode).cookie("token", token, options).json({
     success: true,
-    token
+    token,
   });
 };
 
@@ -111,4 +111,26 @@ exports.logout = async (req, res, next) => {
     success: true,
     data: {},
   });
+};
+
+// @desc        Delete account user
+// @routes      DELETE /api/project/auth/delete
+// @access      Private
+exports.deleteMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: `Bootcamp not found with id of ${req.params.id}`,
+      });
+    }
+
+    await user.deleteOne();
+    res.status(200).json({ success: true, data: {} });
+    next();
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
 };
