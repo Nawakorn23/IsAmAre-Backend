@@ -2,7 +2,7 @@ const User = require("../models/User");
 const { options } = require("../routes/coworkings");
 
 //desc    Register user
-//route   POST /api/coworking/auth/register
+//route   POST /api/project/auth/register
 //access  Public
 exports.register = async (req, res, next) => {
   try {
@@ -24,40 +24,49 @@ exports.register = async (req, res, next) => {
 
 //desc    Login user
 //route   POST /api/project/auth/login
-//access  Private
+//access  Public
 exports.login = async (req, res, next) => {
+  try {  
+    const { email, password } = req.body;
 
-  try{  
-  const { email, password } = req.body;
+    // Validate email & password
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an email and password"
+      });
+    }
 
-  // Validate email & password
-  if (!email || !password) {
-    return res
-      .status(400)
-      .json({ success: false, msg: "Please provide an email and password" });
-  }
+    // Check for user
+    const user = await User.findOne({ email }).select("+password");
 
-  // Check for user
-  const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials"
+      });
+    }
+    // Check if password matches
+    const isMatch = await user.matchPassword(password);
 
-  if (!user) {
-    return res.status(400).json({ success: false, msg: "Invalid credentials" });
-  }
-  // Check if password matches
-  const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials"
+      });
+    }
 
-  if (!isMatch) {
-    return res.status(401).json({ success: false, msg: "Invalid credentials" });
-  }
+    // Create token
+    // const token = user.getSignedJwtToken();
+    // res.status(200).json({ success: true, token });
 
-  // Create token
-  // const token = user.getSignedJwtToken();
-  // res.status(200).json({ success: true, token });
-
-  sendTokenResponse(user, 200, res);}
-  catch{
-    return res.status(401).json({success:false,msg: 'Cannot convert email or password to string'});
-  }
+    sendTokenResponse(user, 200, res);}
+    catch (err) {
+      return res.status(401).json({
+        success:false,
+        message: "Cannot convert email or password to string"
+      });
+    }
 };
 
 const sendTokenResponse = (user, statusCode, res) => {
@@ -73,14 +82,14 @@ const sendTokenResponse = (user, statusCode, res) => {
     options.secure = true;
   }
 
-  res
-    .status(statusCode)
-    .cookie("token", token, options)
-    .json({ success: true, token });
+  res.status(statusCode).cookie("token", token, options).json({
+    success: true,
+    token
+  });
 };
 
 //desc    Get current Logged in user
-//route   POST /api/project/auth/me
+//route   GET /api/project/auth/me
 //access  Private
 exports.getMe = async (req, res, next) => {
   const user = await User.findById(req.user.id);
@@ -91,7 +100,7 @@ exports.getMe = async (req, res, next) => {
 };
 
 //desc    Log user out / clear cookie
-//route   GET /api/v1/auth/logout
+//route   GET /api/project/auth/logout
 //access  Private
 exports.logout = async (req, res, next) => {
   res.cookie("token", "none", {

@@ -4,7 +4,6 @@ const Coworking = require("../models/Coworking");
 // @routes      Get /api/project/coworkings
 // @access      Public
 exports.getCoworkings = async (req, res, next) => {
-  // res.status(200).json({ success: true, msg: "Show all coworkings" });
   try {
     let query;
 
@@ -16,6 +15,7 @@ exports.getCoworkings = async (req, res, next) => {
 
     //Loop over remove fields and delete them from reqQuery
     removeFields.forEach((param) => delete reqQuery[param]);
+    //console.log(reqQuery);
 
     //Create query string
     let queryStr = JSON.stringify(reqQuery);
@@ -27,7 +27,7 @@ exports.getCoworkings = async (req, res, next) => {
     );
 
     //finding resource
-    query = Coworking.find(JSON.parse(queryStr)).populate("appointments");
+    query = Coworking.find(JSON.parse(queryStr)).populate("reservations");
 
     //Select Feilds
     if (req.query.select) {
@@ -60,13 +60,13 @@ exports.getCoworkings = async (req, res, next) => {
     if (endIndex < total) {
       pagination.next = {
         page: page + 1,
-        limit,
+        limit
       };
     }
     if (startIndex > 0) {
       pagination.prev = {
         page: page - 1,
-        limit,
+        limit
       };
     }
 
@@ -80,17 +80,16 @@ exports.getCoworkings = async (req, res, next) => {
       data: coworkings,
     });
   } catch (err) {
-    res.status(400).json({ success: false });
+    res.status(400).json({
+      success: false
+    });
   }
 };
 
-// @desc        Get all coworkings
+// @desc        Get single coworking
 // @routes      GET /api/project/coworkings/:id
 // @access      Public
 exports.getCoworking = async (req, res, next) => {
-  // res
-  //   .status(200)
-  //   .json({ success: true, msg: `Show coworking ${req.params.id}` });
   try {
     const coworking = await Coworking.findById(req.params.id);
 
@@ -98,14 +97,17 @@ exports.getCoworking = async (req, res, next) => {
       return res.status(400).json({ success: false });
     }
 
-    res.status(200).json({ success: true, data: coworking });
+    res.status(200).json({
+      success: true,
+      data: coworking
+    });
   } catch (err) {
     res.status(400).json({ success: false });
   }
 };
 
-// @desc        Get all coworkings
-// @routes      GET /api/project/coworkings
+// @desc        Create a coworking
+// @routes      POST /api/project/coworkings
 // @access      Private
 exports.createCoworking = async (req, res, next) => {
   // console.log(req.body);
@@ -113,13 +115,10 @@ exports.createCoworking = async (req, res, next) => {
   res.status(201).json({ success: true, data: coworking });
 };
 
-// @desc        Get all coworkings
+// @desc        Update single coworking
 // @routes      PUT /api/project/coworkings/:id
 // @access      Private
 exports.updateCoworking = async (req, res, next) => {
-  // res
-  //   .status(200)
-  //   .json({ success: true, msg: `Update coworking ${req.params.id}` });
   try {
     const coworking = await Coworking.findByIdAndUpdate(
       req.params.id,
@@ -134,13 +133,15 @@ exports.updateCoworking = async (req, res, next) => {
       return res.status(400).json({ success: false });
     }
 
-    res.status(200).json({ success: true, data: coworking });
+    res.status(200).json({
+      success: true,
+      data: coworking });
   } catch (err) {
     res.status(400).json({ success: false });
   }
 };
 
-// @desc        Get all coworkings
+// @desc        Delete single coworking
 // @routes      DELETE /api/project/coworkings/:id
 // @access      Private
 exports.deleteCoworking = async (req, res, next) => {

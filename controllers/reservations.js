@@ -202,6 +202,6 @@ exports.deleteReservation = async (req, res, next) => {
     console.log(err.stack);
     return res.status(500).json({
       success: false,
-      message: "Cannot delete Appointment" });
+      message: "Cannot delete Reservation" });
   }
 };
