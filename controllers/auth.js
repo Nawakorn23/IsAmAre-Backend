@@ -166,4 +166,21 @@ exports.deleteMe = async (req, res, next) => {
   }
 };
 
-
+//desc    Get all users
+//route   GET /api/project/auth/getallusers
+//access  Private
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    //Executing query
+    const users = await User.find({role: "user"});
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false
+    });
+  }
+}
