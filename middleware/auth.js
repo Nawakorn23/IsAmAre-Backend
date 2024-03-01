@@ -13,7 +13,7 @@ exports.protect = async (req, res, next) => {
   }
 
   // Make sure token exists
-  if (!token) {
+  if (!token || token == 'null') {
     return res.status(401).json({
       success: false,
       message: "Not authorized to access this route",
@@ -31,9 +31,10 @@ exports.protect = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err.stack);
-    return res
-      .status(401)
-      .json({ success: false, message: "Not authorized to access this route" });
+    return res.status(401).json({
+      success: false,
+      message: "Not authorized to access this route"
+    });
   }
 };
 
