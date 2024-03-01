@@ -112,6 +112,13 @@ exports.addReservation = async (req, res, next) => {
       });
     }
 
+    if (req.body.start.localeCompare(req.body.end) > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Please make valid reservation`,
+      });
+    }
+
     const reservation = await Reservation.create(req.body);
     res.status(200).json({
       success: true,
