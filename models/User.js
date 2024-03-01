@@ -38,6 +38,10 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+},
+{
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
 });
 
 // Encrypt password using bcrypt
@@ -57,4 +61,23 @@ UserSchema.methods.getSignedJwtToken = function () {
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
+
+// Cascade delete appointments when a coworking is deleted
+UserSchema.pre(
+  "deleteOne",
+  { document: true, query: false },
+  async function (next) {
+    console.log(`Reservations begin removed from user ${this._id}`);
+    await this.model("Reservation").deleteMany({ user: this._id });
+    next();
+  }
+);
+
+// Reverse populate with virtuals
+UserSchema.virtual("reservations", {
+  ref: "Reservation",
+  localField: "_id",
+  foreignField: "user",
+  justOne: false,
+});
 module.exports = mongoose.model("User", UserSchema);
