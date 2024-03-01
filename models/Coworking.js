@@ -7,7 +7,7 @@ const CoworkingSchema = new mongoose.Schema(
       required: [true, "Please add a name"],
       unique: true,
       trim: true,
-      maxlength: [50, "Name can not be more than 50 charaters"],
+      maxlength: [50, "Name can not be more than 50 charaters"]
     },
     address: {
       type: String,
@@ -24,10 +24,10 @@ const CoworkingSchema = new mongoose.Schema(
     postalcode: {
       type: String,
       required: [true, "Please add a postslcode"],
-      maxlength: [5, "Postal Code can not be more than 5 digits"],
+      maxlength: [5, "Postal Code can not be more than 5 digits"]
     },
     telephone: {
-      type: String,
+      type: String
     },
     region: {
       type: String,
@@ -53,15 +53,15 @@ CoworkingSchema.pre(
   "deleteOne",
   { document: true, query: false },
   async function (next) {
-    console.log(`Appointments begin removed from coworking ${this._id}`);
-    await this.model("Appointment").deleteMany({ coworking: this._id });
+    console.log(`Reservations begin removed from coworking ${this._id}`);
+    await this.model("Reservation").deleteMany({ coworking: this._id });
     next();
   }
 );
 
 // Reverse populate with virtuals
-CoworkingSchema.virtual("appointments", {
-  ref: "Appointment",
+CoworkingSchema.virtual("reservations", {
+  ref: "Reservation",
   localField: "_id",
   foreignField: "coworking",
   justOne: false,

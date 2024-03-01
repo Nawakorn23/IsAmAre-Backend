@@ -8,14 +8,14 @@ const {
 } = require("../controllers/coworkings");
 
 //Include other resource routers
-const appointmentRouter = require("./appointments");
+const reservationRouter = require("./reservations");
 
 const router = express.Router();
 
 const { protect, authorize } = require("../middleware/auth");
 
 //Re-route into other resource routers
-router.use("/:coworkingId/appointments/", appointmentRouter);
+router.use("/:coworkingId/reservations/", reservationRouter);
 
 router
   .route("/")
