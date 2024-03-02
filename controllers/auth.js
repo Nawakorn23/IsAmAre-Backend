@@ -12,6 +12,9 @@ exports.register = async (req, res, next) => {
     const user = await User.create({ name, email, telephone, password, role });
 
     // Create token
+    // const token = user.getSignedJwtToken();
+    // res.status(200).json({ success: true, token });
+
     sendTokenResponse(user, 200, res);
   } catch (err) {
     res.status(400).json({ success: false });
@@ -54,13 +57,15 @@ exports.login = async (req, res, next) => {
     }
 
     // Create token
+    // const token = user.getSignedJwtToken();
+    // res.status(200).json({ success: true, token });
+
     sendTokenResponse(user, 200, res);
   } catch (err) {
     return res.status(401).json({
       success: false,
       message: "Cannot convert email or password to string",
     });
-    console.log(err.stack);
   }
 };
 
@@ -113,24 +118,27 @@ exports.logout = async (req, res, next) => {
 //@access       Private
 exports.updateMe = async (req, res, next) => {
   try {
-    if (req.body.role) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Cannot update role" });
+
+    if(req.body.role){
+      return res.status(400).json({ success: false,message:"false jaaa"});
     }
-    const user = await User.findByIdAndUpdate(req.user.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!user) {
-      return res.status(400).json({ success: false, message: "not user" });
+      return res.status(400).json({ success: false,message:"not user" });
     }
+    
 
     res.status(200).json({
       success: true,
-      data: user,
-    });
+      data: user });
   } catch (err) {
     res.status(400).json({ success: false });
   }
@@ -158,85 +166,4 @@ exports.deleteMe = async (req, res, next) => {
   }
 };
 
-// desc    Get all users
-// route   GET /api/project/auth/getallusers
-// access  Private
-exports.getAllUsers = async (req, res, next) => {
-  try {
-    let query;
 
-    // Copy req.query
-    const reqQuery = { ...req.query };
-
-    // Fields to exclude
-    const removeFields = ["select", "sort", "page", "limit"];
-
-    // Loop over remove fields and delete them from reqQuery
-    removeFields.forEach((param) => delete reqQuery[param]);
-
-    // Create query string
-    let queryStr = JSON.stringify(reqQuery);
-
-    // Create operators {$gt, $gte, etc}
-    queryStr = queryStr.replace(
-      /\b(gt|gte|lt|lte|in)\b/g,
-      (match) => `$${match}`
-    );
-
-    // Finding resource
-    query = User.find(JSON.parse(queryStr)).populate("reservations");
-    query = query.find({ role: "user" });
-
-    // Select Fields
-    if (req.query.select) {
-      const fields = req.query.select.split(",").join(" ");
-      query = query.select(fields);
-    }
-
-    // Sort
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" ");
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort("email");
-    }
-
-    // Pagination
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 25;
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    const total = await User.find({ role: "user" }).countDocuments();
-
-    query = query.skip(startIndex).limit(limit);
-
-    // Executing query
-    const users = await query;
-
-    // Pagination query
-    const pagination = {};
-    if (endIndex < total) {
-      pagination.next = {
-        page: page + 1,
-        limit,
-      };
-    }
-    if (startIndex > 0) {
-      pagination.prev = {
-        page: page - 1,
-        limit,
-      };
-    }
-
-    res.status(200).json({
-      success: true,
-      count: users.length,
-      pagination,
-      data: users,
-    });
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-    });
-  }
-};
