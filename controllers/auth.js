@@ -131,7 +131,7 @@ exports.updateMe = async (req, res, next) => {
       }
     );
 
-    if (!user) {c
+    if (!user) {
       return res.status(400).json({ success: false,message:"not user" });
     }
     
