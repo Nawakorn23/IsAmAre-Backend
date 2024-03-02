@@ -1,0 +1,29 @@
+@startuml Authorization System Use Case Diagram
+left to right direction
+actor "User" as user
+rectangle "Authorization" as AuthorizationSystem {  
+    usecase "View All User" as viewallUser
+    usecase "Register" as register
+    usecase "Login" as login
+    usecase "GetMe" as getMe
+    usecase "Logout" as logout
+    usecase "Update Own User" as updateOwnUser
+    usecase "Delete Own User" as deleteOwnUser
+}
+
+user -- register
+user -- login
+user -- getMe
+user -- logout
+user -- updateOwnUser
+user -- deleteOwnUser
+
+actor "Admin" as admin
+register -- admin
+login -- admin
+getMe -- admin
+logout -- admin
+viewallUser -- admin
+
+
+@enduml
