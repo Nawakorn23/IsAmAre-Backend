@@ -1,4 +1,3 @@
-const Appointment = require("../models/Reservation");
 const Coworking = require("../models/Coworking");
 const Reservation = require("../models/Reservation");
 
@@ -7,7 +6,6 @@ const Reservation = require("../models/Reservation");
 //access  Public
 exports.getReservations = async (req, res, next) => {
   let query;
-
   // General users can see only their appointment
   if (req.user.role !== "admin") {
     query = Reservation.find({ user: req.user.id }).populate({
@@ -18,29 +16,29 @@ exports.getReservations = async (req, res, next) => {
     // If you are an admin, you can see all
     if (req.params.coworkingId) {
       console.log(req.params.coworkingId);
-      query=Reservation.find({ coworking: req.params.coworkingId }).populate({
-          path: "coworking",
-          select: "name province tel"
+      query = Reservation.find({ coworking: req.params.coworkingId }).populate({
+        path: "coworking",
+        select: "name province tel",
       });
-  } else {
-      query=Reservation.find().populate({
-          path: "coworking",
-          select: "name province tel"
+    } else {
+      query = Reservation.find().populate({
+        path: "coworking",
+        select: "name province tel",
       });
-  }
+    }
   }
   try {
     const reservations = await query;
     res.status(200).json({
       success: true,
       count: reservations.length,
-      data: reservations
+      data: reservations,
     });
   } catch (err) {
     console.log(err.stack);
     return res.status(500).json({
       success: false,
-      message: "Cannot find Appointment"
+      message: "Cannot find Appointment",
     });
   }
 };
@@ -69,7 +67,7 @@ exports.getReservation = async (req, res, next) => {
     console.log(err.stack);
     return res.status(500).json({
       success: false,
-      message: "Cannot find Reservation"
+      message: "Cannot find Reservation",
     });
   }
 };
@@ -105,7 +103,10 @@ exports.addReservation = async (req, res, next) => {
     }
 
     //const start = req.body.apptDate.split('T')[1].split('.')[0];
-    if (req.body.start.localeCompare(coworking.opentime) < 0 || (req.body.end.localeCompare(coworking.closetime) > 0)) {
+    if (
+      req.body.start.localeCompare(coworking.opentime) < 0 ||
+      req.body.end.localeCompare(coworking.closetime) > 0
+    ) {
       return res.status(400).json({
         success: false,
         message: `Please make reservation within ${coworking.opentime} and ${coworking.closetime}`,
@@ -128,7 +129,7 @@ exports.addReservation = async (req, res, next) => {
     console.log(err.stack);
     return res.status(500).json({
       success: false,
-      message: "Cannot create Reservation"
+      message: "Cannot create Reservation",
     });
   }
 };
@@ -169,7 +170,7 @@ exports.updateReservation = async (req, res, next) => {
     console.log(err.stack);
     return res.status(500).json({
       success: false,
-      message: "Cannot update Reservation"
+      message: "Cannot update Reservation",
     });
   }
 };
@@ -209,6 +210,7 @@ exports.deleteReservation = async (req, res, next) => {
     console.log(err.stack);
     return res.status(500).json({
       success: false,
-      message: "Cannot delete Reservation" });
+      message: "Cannot delete Reservation",
+    });
   }
 };

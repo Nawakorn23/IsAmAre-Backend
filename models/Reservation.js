@@ -4,7 +4,6 @@ const ReservationSchema = new mongoose.Schema({
   apptDate: {
     type: Date,
     required: true,
-    
   },
   user: {
     type: mongoose.Schema.ObjectId,
@@ -18,11 +17,11 @@ const ReservationSchema = new mongoose.Schema({
   },
   start: {
     type: String,
-    required: true
+    required: true,
   },
   end: {
     type: String,
-    required: true
+    required: true,
   },
   createAt: {
     type: Date,

@@ -1,4 +1,3 @@
-const Reservation = require("../models/Reservation");
 const User = require("../models/User");
 const { options } = require("../routes/coworkings");
 
@@ -13,9 +12,6 @@ exports.register = async (req, res, next) => {
     const user = await User.create({ name, email, telephone, password, role });
 
     // Create token
-    // const token = user.getSignedJwtToken();
-    // res.status(200).json({ success: true, token });
-
     sendTokenResponse(user, 200, res);
   } catch (err) {
     res.status(400).json({ success: false });
@@ -58,15 +54,13 @@ exports.login = async (req, res, next) => {
     }
 
     // Create token
-    // const token = user.getSignedJwtToken();
-    // res.status(200).json({ success: true, token });
-
     sendTokenResponse(user, 200, res);
   } catch (err) {
     return res.status(401).json({
       success: false,
       message: "Cannot convert email or password to string",
     });
+    console.log(err.stack);
   }
 };
 
@@ -119,27 +113,24 @@ exports.logout = async (req, res, next) => {
 //@access       Private
 exports.updateMe = async (req, res, next) => {
   try {
-
-    if(req.body.role){
-      return res.status(400).json({ success: false,message:"false jaaa"});
+    if (req.body.role) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Cannot update role" });
     }
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-    if (!user) {c
-      return res.status(400).json({ success: false,message:"not user" });
+    if (!user) {
+      return res.status(400).json({ success: false, message: "not user" });
     }
-    
 
     res.status(200).json({
       success: true,
-      data: user });
+      data: user,
+    });
   } catch (err) {
     res.status(400).json({ success: false });
   }
@@ -193,9 +184,8 @@ exports.getAllUsers = async (req, res, next) => {
     );
 
     // Finding resource
-    query = User.find(JSON.parse(queryStr)).populate('reservations');
-    query = query.find( {role: "user"} );
-
+    query = User.find(JSON.parse(queryStr)).populate("reservations");
+    query = query.find({ role: "user" });
 
     // Select Fields
     if (req.query.select) {
@@ -216,7 +206,7 @@ exports.getAllUsers = async (req, res, next) => {
     const limit = parseInt(req.query.limit, 10) || 25;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-    const total = await User.find({role: "user"}).countDocuments();
+    const total = await User.find({ role: "user" }).countDocuments();
 
     query = query.skip(startIndex).limit(limit);
 
@@ -228,13 +218,13 @@ exports.getAllUsers = async (req, res, next) => {
     if (endIndex < total) {
       pagination.next = {
         page: page + 1,
-        limit
+        limit,
       };
     }
     if (startIndex > 0) {
       pagination.prev = {
         page: page - 1,
-        limit
+        limit,
       };
     }
 
@@ -250,4 +240,3 @@ exports.getAllUsers = async (req, res, next) => {
     });
   }
 };
-

@@ -60,13 +60,13 @@ exports.getCoworkings = async (req, res, next) => {
     if (endIndex < total) {
       pagination.next = {
         page: page + 1,
-        limit
+        limit,
       };
     }
     if (startIndex > 0) {
       pagination.prev = {
         page: page - 1,
-        limit
+        limit,
       };
     }
 
@@ -81,7 +81,7 @@ exports.getCoworkings = async (req, res, next) => {
     });
   } catch (err) {
     res.status(400).json({
-      success: false
+      success: false,
     });
   }
 };
@@ -99,7 +99,7 @@ exports.getCoworking = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: coworking
+      data: coworking,
     });
   } catch (err) {
     res.status(400).json({ success: false });
@@ -135,7 +135,8 @@ exports.updateCoworking = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: coworking });
+      data: coworking,
+    });
   } catch (err) {
     res.status(400).json({ success: false });
   }
