@@ -1,0 +1,32 @@
+@startuml Coworking System Use Case Diagram
+left to right direction
+actor "User" as user
+rectangle "Coworking" as CoworkingSystem {    
+    usecase "Create new Coworking" as createCoworking
+
+    usecase "View All Coworking" as viewAllCoworking
+    usecase "View Coworking by Id" as viewIdCoworking
+
+    usecase "Edit Coworking by Id" as editIdReservation
+    usecase "Delete Coworking by Id" as deleteIdervation
+
+}
+
+
+user -- viewAllCoworking
+user -- viewIdCoworking
+
+
+
+actor "Admin" as admin
+createCoworking -- admin
+
+viewAllCoworking -- admin
+viewIdCoworking -- admin
+
+editIdReservation -- admin
+deleteIdervation -- admin
+
+
+
+@enduml

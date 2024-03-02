@@ -1,3 +1,4 @@
+const { Int32 } = require("bson");
 const mongoose = require("mongoose");
 
 const CoworkingSchema = new mongoose.Schema(
@@ -7,7 +8,7 @@ const CoworkingSchema = new mongoose.Schema(
       required: [true, "Please add a name"],
       unique: true,
       trim: true,
-      maxlength: [50, "Name can not be more than 50 charaters"]
+      maxlength: [50, "Name can not be more than 50 charaters"],
     },
     address: {
       type: String,
@@ -22,12 +23,12 @@ const CoworkingSchema = new mongoose.Schema(
       required: [true, "Please add a province"],
     },
     postalcode: {
-      type: String,
+      type: Number,
       required: [true, "Please add a postslcode"],
-      maxlength: [5, "Postal Code can not be more than 5 digits"]
+      maxlength: [5, "Postal Code can not be more than 5 digits"],
     },
     telephone: {
-      type: String
+      type: String,
     },
     region: {
       type: String,
@@ -35,11 +36,11 @@ const CoworkingSchema = new mongoose.Schema(
     },
     opentime: {
       type: String,
-      required: true
+      required: true,
     },
     closetime: {
       type: String,
-      required: true
+      required: true,
     },
   },
   {

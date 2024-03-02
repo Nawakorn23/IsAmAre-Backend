@@ -1,0 +1,37 @@
+@startuml Reservation System Use Case Diagram
+left to right direction
+actor "User" as user
+rectangle "Reservation" as ReservationSystem {    
+    usecase "Create new Reservation" as createReservation
+    
+    usecase "View\nOwn Reservation" as viewOwnReservation
+    usecase "Edit\nOwn Reservation" as editOwnReservation
+    usecase "Delete\nOwn Reservation" as deleteOwnReservation
+
+    usecase "View\nReservation By Id" as viewReservationById
+    usecase "Edit\nReservation By Id" as editReservationById
+    usecase "Delete\nReservation By Id" as deleteReservationById
+
+}
+
+
+user -- createReservation
+user -- viewOwnReservation
+user -- editOwnReservation
+user -- deleteOwnReservation
+
+
+actor "Admin" as admin
+createReservation -- admin
+
+viewOwnReservation -- admin
+editOwnReservation -- admin
+deleteOwnReservation -- admin
+
+viewReservationById -- admin
+editReservationById -- admin
+deleteReservationById -- admin
+
+
+
+@enduml

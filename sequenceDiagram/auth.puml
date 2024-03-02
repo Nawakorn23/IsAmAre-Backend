@@ -1,0 +1,171 @@
+@startuml
+title "Authorization"
+participant "User" as user
+participant "Admin" as admin
+participant "Server" as server
+participant "<<routes>>\nauth" as routes 
+participant "<<middleware>>\nauth" as middleware
+participant "<<controllers>>\nauth" as ControlAuth
+participant "<<models>>\nUser" as modelsUser
+participant "MongoDB" as mongodb
+
+   user ++
+   admin ++
+   server ++
+   routes ++
+   middleware ++
+   modelsUser ++
+   ControlAuth ++
+   modelsUser ++
+   mongodb ++
+/'Register'/
+opt
+   user -> server :req.post('/api/project/auth/register')
+   admin -> server
+   server -> routes :app.use('/api/project/auth', auth)
+   routes -> ControlAuth :post("/register", register)
+   ControlAuth -> modelsUser :User.create({ name, email, \ntelephone, password, role })
+   modelsUser -> mongodb :create({ name, email, \ntelephone, password, role })
+   mongodb --> modelsUser :user
+   modelsUser --> ControlAuth :user
+   ControlAuth -> modelsUser :user.getSignedJwtToken()
+   modelsUser --> ControlAuth :token
+   ControlAuth --> routes :response
+   routes --> server :response
+   server --> user :response
+   server --> admin 
+end
+
+/'Login'/
+opt
+   user -> server :req.post('/api/project/auth/login')
+   admin -> server 
+   server -> routes :app.use('/api/project/auth', auth)
+   routes -> ControlAuth :post('/login', login)
+   ControlAuth -> modelsUser :User.findOne({ email }).\nselect('+password')
+   modelsUser -> mongodb :findOne({ email }).\nselect('+password')
+   mongodb --> modelsUser :user
+   modelsUser --> ControlAuth :user
+   ControlAuth -> modelsUser :user.matchPassword(password)
+   modelsUser --> ControlAuth : match
+   ControlAuth -> modelsUser :user.getSignedJwtToken()
+   modelsUser --> ControlAuth :token
+   ControlAuth --> routes :response
+   routes --> server :response
+   server --> user :response
+   server --> admin
+end
+
+/'getMe'/
+opt
+   user -> server :req.get('/api/project/auth/me')
+   admin -> server
+   server -> routes :app.use('/api/project/auth', auth)
+   routes->middleware :protect(token)
+   middleware->middleware :decoded
+   middleware->modelsUser :User.findById(decoded.id)
+   modelsUser->mongodb :findById(decoded.id)
+   mongodb --> modelsUser :user
+   modelsUser --> middleware :user
+   middleware -->routes :next()
+   routes -> ControlAuth :get('/me', protect, getMe);
+   ControlAuth -> modelsUser :User.findById(req.user.id)
+   modelsUser -> mongodb :findById(req.user.id)
+   mongodb --> modelsUser :user
+   modelsUser --> ControlAuth :user
+   ControlAuth --> routes :response
+   routes --> server :response
+   server --> user :response
+   server --> admin
+end
+
+/'log out'/
+opt
+   user -> server :req.get('/api/project/auth/logout')
+   admin -> server
+   server -> routes :app.use('/api/project/auth', auth)
+   routes -> ControlAuth :get('/logout', logout)
+   ControlAuth -> ControlAuth :res.cookie("token", "none", \n{expires: new Date(Date.now() + 10 * 1000)\n,httpOnly: true,});
+   /'ControlAuth -> ControlAuth :expire'/
+   ControlAuth --> routes :response
+   routes --> server :response
+   server --> user :response
+   server --> admin
+end
+/'Additional'/
+/'User Update Me'/
+'/Update Me router.put("/updateMe",protect,updateMe);'/
+opt
+   user -> server :req.put('/api/project/auth/updateMe')
+   admin -> server 
+   server -> routes :app.use('/api/project/auth', auth)
+   routes -> middleware:protect(token)
+   middleware->modelsUser :User.findById(decoded.id)
+   mongodb --> modelsUser :user
+   modelsUser --> middleware :user
+   middleware -->routes :next()
+   routes -> ControlAuth :put('/updateMe',updateMe);
+   ControlAuth -> ControlAuth :!req.body.role
+   ControlAuth -> modelsUser :User.findByIdAndUpdate\n(req.user.id,req.body,\n{new: true,runValidators: true})
+   modelsUser -> mongodb :findByIdAndUpdate\n(req.user.id,req.body,\n{new: true,runValidators: true})
+   mongodb --> modelsUser :User
+   modelsUser --> ControlAuth :User
+   ControlAuth --> routes :response
+   routes --> server :response
+   server --> user :response
+   server --> admin
+end
+
+/'Delete Me  router.delete("/deleteMe", protect, deleteMe, logout);'/
+opt
+   user -> server :req.delete('/api/project/auth/deleteMe')
+   admin -> server 
+   server -> routes :app.use('/api/project/auth', auth)
+   routes -> middleware:protect(token)
+   middleware->modelsUser :User.findById(decoded.id)
+   mongodb --> modelsUser :user
+   modelsUser --> middleware :user
+   middleware -->routes :next()
+   routes -> ControlAuth :delete('/deleteMe', deleteMe)
+   ControlAuth -> modelsUser :User.findById(req.user.id)
+   modelsUser -> mongodb :findById(req.user.id)
+   mongodb --> modelsUser :user
+   modelsUser --> ControlAuth :user
+   ControlAuth -> modelsUser :user.deleteOne()
+   modelsUser -> mongodb :deleteOne()
+   mongodb --> modelsUser :response
+   modelsUser --> ControlAuth :response
+   ControlAuth --> routes :response
+   routes --> server :response
+   server --> user :response
+   server --> admin 
+end
+/'User Delete Me'/
+opt
+   admin -> server :req.get('/api/project/auth/getallusers')
+   server -> routes :app.use('/api/project/auth', auth)
+   routes -> middleware:protect(token)
+   middleware->modelsUser :User.findById(decoded.id)
+   mongodb --> modelsUser :user
+   modelsUser --> middleware :user
+   middleware -->routes :next()
+   routes -> middleware :authorize('admin') 
+   middleware -> middleware :roles.includes(req.user.role)
+   middleware --> routes :next()
+   routes -> ControlAuth :get('/getallusers',getAllUsers)
+   ControlAuth -> modelsUser :User.find(JSON.parse(queryStr)).populate('reservations')
+   modelsUser -> mongodb :find(JSON.parse(queryStr)).populate('reservations')
+   mongodb --> modelsUser :user
+   modelsUser --> ControlAuth :coworkings
+   ControlAuth -> ControlAuth :query.find({ role: 'user'})
+   ControlAuth -> ControlAuth :req.query.select
+   ControlAuth -> ControlAuth :req.query.sort
+   ControlAuth --> routes :response
+   routes --> server :response
+   server --> user :response
+   server --> admin
+end
+/'Admin View All Users'/
+
+
+@enduml
