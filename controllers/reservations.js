@@ -140,6 +140,10 @@ exports.addReservation = async (req, res, next) => {
 exports.updateReservation = async (req, res, next) => {
   try {
     let reservation = await Reservation.findById(req.params.id);
+
+    let coworking = await Coworking.findById(reservation.coworking);
+    
+    //const coworking = await Coworking.findById(req.params.coworkingId);
     if (!reservation) {
       return res.status(404).json({
         success: false,
@@ -158,13 +162,33 @@ exports.updateReservation = async (req, res, next) => {
       });
     }
 
+    if (
+      req.body.start.localeCompare(coworking.opentime) < 0 ||
+      req.body.end.localeCompare(coworking.closetime) > 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: `Please update reservation within ${coworking.opentime} and ${coworking.closetime}`,
+      });
+    }
+
+    if (req.body.start.localeCompare(req.body.end) > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Please update valid reservation`,
+      });
+    }
+
     reservation = await Reservation.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
+    
     res.status(200).json({
+      
       success: true,
       data: reservation,
+      
     });
   } catch (err) {
     console.log(err.stack);

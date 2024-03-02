@@ -2,129 +2,129 @@
 title "Coworking"
 participant "User" as user
 participant "Admin" as admin
-participant "Server" as server
-participant "<<routes>>\ncoworkings" as routes 
-participant "<<middleware>>\nauth" as middleware
+participant "Server" as serverUML
+participant "<<routes>>\ncoworkings" as routesUML 
+participant "<<middleware>>\nauth" as middlewareUML
 participant "<<controllers>>\ncoworking" as controlCoWorking
 participant "<<models>>\nUser" as modelsUser
 participant "<<models>>\nCoworking" as modelsCoworking
-participant "MongoDB" as mongodb
+participant "MongoDB" as mongodbUML
    
    user ++
    admin ++
-   server ++
-   routes ++
-   middleware ++
+   serverUML ++
+   routesUML ++
+   middlewareUML ++
    modelsUser ++
    controlCoWorking ++
    modelsCoworking ++
-   mongodb ++
+   mongodbUML ++
    
 /'getCoworkings All ????????????????????????'/  
 opt
-   user -> server :req.get('/api/project/coworkings')
-   admin -> server 
-   server -> routes :app.use('/api/project/coworkings', coworkings)
-   routes -> controlCoWorking :get('/',getCoworkings)
+   user -> serverUML :req.get('/api/project/coworkings')
+   admin -> serverUML 
+   serverUML -> routesUML :app.use('/api/project/coworkings', coworkings)
+   routesUML -> controlCoWorking :get('/',getCoworkings)
    controlCoWorking -> modelsCoworking :Coworking.find(JSON.parse(queryStr)).populate('reservations')
-   modelsCoworking -> mongodb :find(JSON.parse(queryStr)).populate('reservations')
-   mongodb --> modelsCoworking :coworkings
+   modelsCoworking -> mongodbUML :find(JSON.parse(queryStr)).populate('reservations')
+   mongodbUML --> modelsCoworking :coworkings
    modelsCoworking --> controlCoWorking :coworkings
    controlCoWorking -> controlCoWorking :req.query.select
    controlCoWorking -> controlCoWorking :req.query.sort
-   controlCoWorking --> routes :response
-   routes --> server :response
-   server --> user :response
-   server --> admin
+   controlCoWorking --> routesUML :response
+   routesUML --> serverUML :response
+   serverUML --> user :response
+   serverUML --> admin
 end
 
 /'getCoworkings By Id ????????????????????????'/
 opt
-   user -> server :req.get('/api/project/coworkings/:id')
-   admin -> server
-   server -> routes :app.use("/api/project/coworkings", coworkings);
-   routes -> controlCoWorking :get('/:id',getCoworking)
+   user -> serverUML :req.get('/api/project/coworkings/:id')
+   admin -> serverUML
+   serverUML -> routesUML :app.use("/api/project/coworkings", coworkings);
+   routesUML -> controlCoWorking :get('/:id',getCoworking)
    controlCoWorking -> modelsCoworking :Coworking.findById(req.params.id)
-   modelsCoworking -> mongodb :findById(req.params.id)
-   mongodb --> modelsCoworking :Coworking
+   modelsCoworking -> mongodbUML :findById(req.params.id)
+   mongodbUML --> modelsCoworking :Coworking
    modelsCoworking --> controlCoWorking :coworking
-   controlCoWorking --> routes :response
-   routes --> server :response
-   server --> admin :response
+   controlCoWorking --> routesUML :response
+   routesUML --> serverUML :response
+   serverUML --> admin :response
 end
 
 /'createCoworking user admin '/
 opt
-   admin -> server : req.post('/api/project/coworkings')
-   server ->  routes:app.use('/api/project/coworkings', coworkings)
-   routes -> middleware:protect(token)
-   middleware-> middleware :decoded
-   middleware-> modelsUser :User.findById(decoded.id)
-   modelsUser-> mongodb :findById(decoded.id)
-   mongodb --> modelsUser :user
-   modelsUser --> middleware :user
-   middleware -->routes :next()
-   routes->middleware :authorize('admin') 
-   middleware->middleware :roles.includes(req.user.role)
-   middleware -->routes :next()
-   routes -> controlCoWorking :post('/',createCoworking)
+   admin -> serverUML : req.post('/api/project/coworkings')
+   serverUML ->  routesUML:app.use('/api/project/coworkings', coworkings)
+   routesUML -> middlewareUML:protect(token)
+   middlewareUML-> middlewareUML :decoded
+   middlewareUML-> modelsUser :User.findById(decoded.id)
+   modelsUser-> mongodbUML :findById(decoded.id)
+   mongodbUML --> modelsUser :user
+   modelsUser --> middlewareUML :user
+   middlewareUML -->routesUML :next()
+   routesUML->middlewareUML :authorize('admin') 
+   middlewareUML->middlewareUML :roles.includes(req.user.role)
+   middlewareUML -->routesUML :next()
+   routesUML -> controlCoWorking :post('/',createCoworking)
    controlCoWorking -> modelsCoworking :Coworking.create(req.body)
-   modelsCoworking ->mongodb :create(req.body)
-   mongodb --> modelsCoworking :coworking
+   modelsCoworking ->mongodbUML :create(req.body)
+   mongodbUML --> modelsCoworking :coworking
    modelsCoworking --> controlCoWorking :coworking
-   controlCoWorking --> routes :response
-   routes --> server :response
-   server --> admin :response
+   controlCoWorking --> routesUML :response
+   routesUML --> serverUML :response
+   serverUML --> admin :response
 end
 
 /'Admin Update Coworking   put(protect, authorize("admin"), updateCoworking)'/
 opt
-   admin -> server : req.put('/api/project/coworkings/:id')
-   server ->  routes:app.use('/api/project/coworkings', coworkings)
-   routes -> middleware:protect(token)
-   middleware->middleware :decoded
-   middleware->modelsUser :User.findById(decoded.id)
-   modelsUser->mongodb :findById(decoded.id)
-   mongodb --> modelsUser :user
-   modelsUser --> middleware :user
-   middleware -->routes :next()
-   routes->middleware :authorize('admin') 
-   middleware->middleware :roles.includes(req.user.role)
-   middleware -->routes :next()
-   routes -> controlCoWorking :put(':/id',updateCoworking)
+   admin -> serverUML : req.put('/api/project/coworkings/:id')
+   serverUML ->  routesUML:app.use('/api/project/coworkings', coworkings)
+   routesUML -> middlewareUML:protect(token)
+   middlewareUML->middlewareUML :decoded
+   middlewareUML->modelsUser :User.findById(decoded.id)
+   modelsUser->mongodbUML :findById(decoded.id)
+   mongodbUML --> modelsUser :user
+   modelsUser --> middlewareUML :user
+   middlewareUML -->routesUML :next()
+   routesUML->middlewareUML :authorize('admin') 
+   middlewareUML->middlewareUML :roles.includes(req.user.role)
+   middlewareUML -->routesUML :next()
+   routesUML -> controlCoWorking :put(':/id',updateCoworking)
    controlCoWorking -> modelsCoworking :Coworking.findByIdAndUpdate(req.params.id,\nreq.body,{new: true,runValidators: true,})
-   modelsCoworking -> mongodb :findByIdAndUpdate(req.params.id,\nreq.body,{new: true,runValidators: true,})
-   mongodb --> modelsCoworking :coworking
+   modelsCoworking -> mongodbUML :findByIdAndUpdate(req.params.id,\nreq.body,{new: true,runValidators: true,})
+   mongodbUML --> modelsCoworking :coworking
    modelsCoworking --> controlCoWorking :coworking
-   controlCoWorking --> routes :response
-   routes -->  server :response
+   controlCoWorking --> routesUML :response
+   routesUML -->  serverUML :response
 end
 
 /'Admin Delete'/
 opt
-   admin->server :req.delete('/api/project/coworkings/:id')
-   server->routes :app.use('/api/project/coworkings',\n coworkings)
-   routes->middleware :protect(token)
-   middleware->middleware :decoded
-   middleware->modelsUser :User.findById(decoded.id)
-   modelsUser->mongodb :findById(decoded.id)
-   mongodb --> modelsUser :user
-   modelsUser --> middleware :user
-   middleware -->routes :next()
-   routes->middleware :authorize('admin') 
-   middleware->middleware :roles.includes(req.user.role)
-   middleware -->routes :next()
-   routes -> controlCoWorking :delete(':/id',deleteCoworking)
+   admin->serverUML :req.delete('/api/project/coworkings/:id')
+   serverUML->routesUML :app.use('/api/project/coworkings',\n coworkings)
+   routesUML->middlewareUML :protect(token)
+   middlewareUML->middlewareUML :decoded
+   middlewareUML->modelsUser :User.findById(decoded.id)
+   modelsUser->mongodbUML :findById(decoded.id)
+   mongodbUML --> modelsUser :user
+   modelsUser --> middlewareUML :user
+   middlewareUML -->routesUML :next()
+   routesUML->middlewareUML :authorize('admin') 
+   middlewareUML->middlewareUML :roles.includes(req.user.role)
+   middlewareUML -->routesUML :next()
+   routesUML -> controlCoWorking :delete(':/id',deleteCoworking)
    controlCoWorking -> modelsCoworking :Coworking.findById(req.params.id)
-   modelsCoworking -> mongodb :findById(req.params.id)
-   mongodb --> modelsCoworking :coworking
+   modelsCoworking -> mongodbUML :findById(req.params.id)
+   mongodbUML --> modelsCoworking :coworking
    modelsCoworking --> controlCoWorking :coworking
    controlCoWorking -> modelsCoworking :coworking.deleteOne()
-   modelsCoworking -> mongodb :deleteOne()
-   mongodb --> modelsCoworking :response
+   modelsCoworking -> mongodbUML :deleteOne()
+   mongodbUML --> modelsCoworking :response
    modelsCoworking --> controlCoWorking :response
-   controlCoWorking --> routes :response
-   routes --> server :response
+   controlCoWorking --> routesUML :response
+   routesUML --> serverUML :response
 end
 
 @enduml

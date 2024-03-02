@@ -1,0 +1,37 @@
+@startuml
+title "Coworking"
+participant "User" as user
+participant "Admin" as admin
+participant "Server" as serverUML
+participant "<<routes>>\nreservations" as routesUML 
+participant "<<middleware>>\nauth" as middlewareUML
+participant "<<controllers>>\nreservations" as controlReservation
+participant "<<models>>\nUser" as modelsUser
+participant "<<models>>\nReservstion" as modelsReservstion
+participant "MongoDB" as mongodbUML
+   
+   user ++
+   admin ++
+   serverUML ++
+   routesUML ++
+   middlewareUML ++
+   modelsUser ++
+   controlReservation ++
+   modelsReservstion ++
+   mongodbUML ++
+
+   /'create Reservation'/
+   opt
+      user -> serverUML
+      admin -> serverUML
+
+
+   end
+
+
+
+
+
+
+
+@enduml
