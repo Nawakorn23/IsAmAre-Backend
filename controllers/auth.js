@@ -11,14 +11,13 @@ exports.register = async (req, res, next) => {
 
     // Create user
     const user = await User.create({ name, email, telephone, password, role });
-    
+
     sendTokenResponse(user, 201, res);
   } catch (err) {
     res.status(400).json({ success: false });
     console.log(err.stack);
   }
 };
-
 
 //desc    Login user
 //route   POST /api/project/auth/login
@@ -116,46 +115,40 @@ exports.logout = async (req, res, next) => {
 //@access       Private
 exports.updateMe = async (req, res, next) => {
   try {
-
-    if(req.body.role){
-      return res.status(400).json({ success: false,message:"false jaaa"});
+    if (req.body.role) {
+      return res.status(400).json({ success: false, message: "false jaaa" });
     }
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-    if (!user) {c
-      return res.status(400).json({ success: false,message:"not user" });
+    if (!user) {
+      return res.status(400).json({ success: false, message: "not user" });
     }
-    
 
     res.status(200).json({
       success: true,
-      data: user });
+      data: user,
+    });
   } catch (err) {
     res.status(400).json({ success: false });
   }
 };
 
 // @desc        Delete account user
-// @routes      DELETE /api/project/auth/delete
+// @routes      DELETE /api/project/auth/deleteAccount/:id
 // @access      Private
-exports.deleteMe = async (req, res, next) => {
+exports.deleteAccount = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.params.id);
 
     if (!user) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: `Bootcamp not found with id of ${req.params.id}`,
       });
     }
-
     await user.deleteOne();
     res.status(200).json({ success: true, data: {} });
     next();
@@ -190,9 +183,8 @@ exports.getAllUsers = async (req, res, next) => {
     );
 
     // Finding resource
-    query = User.find(JSON.parse(queryStr)).populate('reservations');
-    query = query.find( {role: "user"} );
-
+    query = User.find(JSON.parse(queryStr)).populate("reservations");
+    query = query.find({ role: "user" });
 
     // Select Fields
     if (req.query.select) {
@@ -213,7 +205,7 @@ exports.getAllUsers = async (req, res, next) => {
     const limit = parseInt(req.query.limit, 10) || 25;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-    const total = await User.find({role: "user"}).countDocuments();
+    const total = await User.find({ role: "user" }).countDocuments();
 
     query = query.skip(startIndex).limit(limit);
 
@@ -225,13 +217,13 @@ exports.getAllUsers = async (req, res, next) => {
     if (endIndex < total) {
       pagination.next = {
         page: page + 1,
-        limit
+        limit,
       };
     }
     if (startIndex > 0) {
       pagination.prev = {
         page: page - 1,
-        limit
+        limit,
       };
     }
 

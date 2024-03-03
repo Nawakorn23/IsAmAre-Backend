@@ -6,7 +6,7 @@ const {
   getMe,
   logout,
   updateMe,
-  deleteMe,
+  deleteAccount,
   getAllUsers,
 } = require("../controllers/auth");
 
@@ -19,7 +19,7 @@ router.post("/login", login);
 router.get("/logout", logout);
 router.get("/me", protect, getMe);
 router.put("/updateMe", protect, updateMe);
-router.delete("/deleteMe", protect, deleteMe, logout);
 router.get("/getallusers", protect, authorize("admin"), getAllUsers);
+router.route("/:id").delete(protect, authorize("admin"), deleteAccount, logout);
 
 module.exports = router;
