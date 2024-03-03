@@ -7,7 +7,7 @@ participant "<<routes>>\nreservations" as routesUML
 participant "<<middleware>>\nauth" as middlewareUML
 participant "<<controllers>>\nreservations" as controlReservation
 participant "<<models>>\nUser" as modelsUser
-participant "<<models>>\nReservstion" as modelsReservstion
+participant "<<models>>\nReservstion" as modelsReservastion
 participant "MongoDB" as mongodbUML
    
    user ++
@@ -17,16 +17,85 @@ participant "MongoDB" as mongodbUML
    middlewareUML ++
    modelsUser ++
    controlReservation ++
-   modelsReservstion ++
+   modelsReservastion ++
    mongodbUML ++
 
-   /'create Reservation'/
+   /'User Get All Reservation'/
    opt
-      user -> serverUML
+      user -> serverUML :req.get('/api/project/reservations')
+      serverUML -> routesUML :app.use('/api/project/reservations', reservations)
+      routesUML-> middlewareUML :protect(token)
+      middlewareUML-> middlewareUML :decoded
+      middlewareUML-> modelsUser :User.findById(decoded.id)
+      modelsUser -> mongodbUML :findById(decoded.id)
+      mongodbUML --> modelsUser :user
+      modelsUser --> middlewareUML :user
+      middlewareUML -->routesUML :next()
+      routesUML -> controlReservation :get('/', getReservations)
+      controlReservation -> modelsReservastion :Reservation.find({ user: req.user.id })\n.populate({path: 'coworking',\nselect: 'name province tel'})
+      modelsReservastion -> mongodbUML :find({ user: req.user.id })\n.populate({path: 'coworking',\nselect: 'name province tel'})
+      mongodbUML --> modelsReservastion :reservation
+      modelsReservastion --> controlReservation :reservation
+      controlReservation --> routesUML :response
+      routesUML --> user :response
+   end
+   /'Admin Get All Reservation'/
+   opt
+      admin -> serverUML :req.get('/api/project/reservations')
+      serverUML -> routesUML :app.use('/api/project/reservations', reservations)
+      routesUML-> middlewareUML :protect(token)
+      middlewareUML-> middlewareUML :decoded
+      middlewareUML-> modelsUser :User.findById(decoded.id)
+      modelsUser -> mongodbUML :findById(decoded.id)
+      mongodbUML --> modelsUser :user
+      modelsUser --> middlewareUML :user
+      middlewareUML -->routesUML :next()
+      routesUML -> controlReservation :get('/', getReservations)
+      controlReservation -> modelsReservastion :Reservation.find().populate({path: 'coworking',\nselect: 'name province tel'})
+      modelsReservastion -> mongodbUML :find().populate({path: 'coworking',\nselect: 'name province tel'})
+      mongodbUML --> modelsReservastion :reservation
+      modelsReservastion --> controlReservation :reservation
+      controlReservation --> routesUML :response
+      routesUML --> admin :response
+   end
+
+   /'Get Reservation By Id'/
+   opt
+      user -> serverUML :req.get('/api/project/reservations/:id')
       admin -> serverUML
+      serverUML -> routesUML :app.use('/api/project/reservations', reservations)
+      routesUML-> middlewareUML :protect(token)
+      middlewareUML-> middlewareUML :decoded
+      middlewareUML-> modelsUser :User.findById(decoded.id)
+      modelsUser -> mongodbUML :findById(decoded.id)
+      mongodbUML --> modelsUser :user
+      modelsUser --> middlewareUML :user
+      middlewareUML -->routesUML :next()
+      routesUML -> controlReservation :get('/:id', getReservation)
+      controlReservation -> modelsReservastion :Reservation.findById(req.params.id).populate({\npath: 'coworking',select: 'name description tel'})
+      modelsReservastion -> mongodbUML :findById(req.params.id).populate({\npath: 'coworking',select: 'name description tel'})
+      mongodbUML --> modelsReservastion :reservation
+      modelsReservastion --> controlReservation :reservation
+      controlReservation --> routesUML :response
+      routesUML -> admin
+      routesUML --> user :response
+   end
+
+
+   /'Create Reservation'/
+   opt
+      user -> serverUML :req.post('/api/project/coworkings/:id/reservations/')
+      admin -> serverUML
+      serverUML -> routesUML :app.use('/api/project/reservations', reservations)
 
 
    end
+   /'Update Reservation'/
+
+
+
+
+   /'Delete Reservation By Id'/
 
 
 

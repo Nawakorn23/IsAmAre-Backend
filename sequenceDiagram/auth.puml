@@ -7,7 +7,7 @@ participant "<<routes>>\nauth" as routesUML
 participant "<<middleware>>\nauth" as middlewareUML
 participant "<<controllers>>\nauth" as ControlAuth
 participant "<<models>>\nUser" as modelsUser
-participant "MongoDB" as modgodbUML
+participant "MongoDB" as mongodbUML
 
    user ++
    admin ++
@@ -17,7 +17,7 @@ participant "MongoDB" as modgodbUML
    modelsUser ++
    ControlAuth ++
    modelsUser ++
-   modgodbUML ++
+   mongodbUML ++
 /'Register'/
 opt
    user -> serverUML :req.post('/api/project/auth/register')
@@ -25,8 +25,8 @@ opt
    serverUML -> routesUML :app.use('/api/project/auth', auth)
    routesUML -> ControlAuth :post("/register", register)
    ControlAuth -> modelsUser :User.create({ name, email, \ntelephone, password, role })
-   modelsUser -> modgodbUML :create({ name, email, \ntelephone, password, role })
-   modgodbUML --> modelsUser :user
+   modelsUser -> mongodbUML :create({ name, email, \ntelephone, password, role })
+   mongodbUML --> modelsUser :user
    modelsUser --> ControlAuth :user
    ControlAuth -> modelsUser :user.getSignedJwtToken()
    modelsUser --> ControlAuth :token
@@ -43,8 +43,8 @@ opt
    serverUML -> routesUML :app.use('/api/project/auth', auth)
    routesUML -> ControlAuth :post('/login', login)
    ControlAuth -> modelsUser :User.findOne({ email }).\nselect('+password')
-   modelsUser -> modgodbUML :findOne({ email }).\nselect('+password')
-   modgodbUML --> modelsUser :user
+   modelsUser -> mongodbUML :findOne({ email }).\nselect('+password')
+   mongodbUML --> modelsUser :user
    modelsUser --> ControlAuth :user
    ControlAuth -> modelsUser :user.matchPassword(password)
    modelsUser --> ControlAuth : match
@@ -64,14 +64,14 @@ opt
    routesUML->middlewareUML :protect(token)
    middlewareUML->middlewareUML :decoded
    middlewareUML->modelsUser :User.findById(decoded.id)
-   modelsUser->modgodbUML :findById(decoded.id)
-   modgodbUML --> modelsUser :user
+   modelsUser->mongodbUML :findById(decoded.id)
+   mongodbUML --> modelsUser :user
    modelsUser --> middlewareUML :user
    middlewareUML -->routesUML :next()
    routesUML -> ControlAuth :get('/me', protect, getMe);
    ControlAuth -> modelsUser :User.findById(req.user.id)
-   modelsUser -> modgodbUML :findById(req.user.id)
-   modgodbUML --> modelsUser :user
+   modelsUser -> mongodbUML :findById(req.user.id)
+   mongodbUML --> modelsUser :user
    modelsUser --> ControlAuth :user
    ControlAuth --> routesUML :response
    routesUML --> serverUML :response
@@ -101,14 +101,14 @@ opt
    serverUML -> routesUML :app.use('/api/project/auth', auth)
    routesUML -> middlewareUML:protect(token)
    middlewareUML->modelsUser :User.findById(decoded.id)
-   modgodbUML --> modelsUser :user
+   mongodbUML --> modelsUser :user
    modelsUser --> middlewareUML :user
    middlewareUML -->routesUML :next()
    routesUML -> ControlAuth :put('/updateMe',updateMe);
    ControlAuth -> ControlAuth :!req.body.role
    ControlAuth -> modelsUser :User.findByIdAndUpdate\n(req.user.id,req.body,\n{new: true,runValidators: true})
-   modelsUser -> modgodbUML :findByIdAndUpdate\n(req.user.id,req.body,\n{new: true,runValidators: true})
-   modgodbUML --> modelsUser :User
+   modelsUser -> mongodbUML :findByIdAndUpdate\n(req.user.id,req.body,\n{new: true,runValidators: true})
+   mongodbUML --> modelsUser :User
    modelsUser --> ControlAuth :User
    ControlAuth --> routesUML :response
    routesUML --> serverUML :response
@@ -123,17 +123,17 @@ opt
    serverUML -> routesUML :app.use('/api/project/auth', auth)
    routesUML -> middlewareUML:protect(token)
    middlewareUML->modelsUser :User.findById(decoded.id)
-   modgodbUML --> modelsUser :user
+   mongodbUML --> modelsUser :user
    modelsUser --> middlewareUML :user
    middlewareUML -->routesUML :next()
    routesUML -> ControlAuth :delete('/deleteMe', deleteMe)
    ControlAuth -> modelsUser :User.findById(req.user.id)
-   modelsUser -> modgodbUML :findById(req.user.id)
-   modgodbUML --> modelsUser :user
+   modelsUser -> mongodbUML :findById(req.user.id)
+   mongodbUML --> modelsUser :user
    modelsUser --> ControlAuth :user
    ControlAuth -> modelsUser :user.deleteOne()
-   modelsUser -> modgodbUML :deleteOne()
-   modgodbUML --> modelsUser :response
+   modelsUser -> mongodbUML :deleteOne()
+   mongodbUML --> modelsUser :response
    modelsUser --> ControlAuth :response
    ControlAuth --> routesUML :response
    routesUML --> serverUML :response
@@ -146,7 +146,7 @@ opt
    serverUML -> routesUML :app.use('/api/project/auth', auth)
    routesUML -> middlewareUML:protect(token)
    middlewareUML->modelsUser :User.findById(decoded.id)
-   modgodbUML --> modelsUser :user
+   mongodbUML --> modelsUser :user
    modelsUser --> middlewareUML :user
    middlewareUML -->routesUML :next()
    routesUML -> middlewareUML :authorize('admin') 
@@ -154,8 +154,8 @@ opt
    middlewareUML --> routesUML :next()
    routesUML -> ControlAuth :get('/getallusers',getAllUsers)
    ControlAuth -> modelsUser :User.find(JSON.parse(queryStr)).populate('reservations')
-   modelsUser -> modgodbUML :find(JSON.parse(queryStr)).populate('reservations')
-   modgodbUML --> modelsUser :user
+   modelsUser -> mongodbUML :find(JSON.parse(queryStr)).populate('reservations')
+   mongodbUML --> modelsUser :user
    modelsUser --> ControlAuth :coworkings
    ControlAuth -> ControlAuth :query.find({ role: 'user'})
    ControlAuth -> ControlAuth :req.query.select
