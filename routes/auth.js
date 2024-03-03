@@ -20,6 +20,5 @@ router.get("/logout", logout);
 router.get("/me", protect, getMe);
 router.put("/updateMe", protect, updateMe);
 router.get("/getallusers", protect, authorize("admin"), getAllUsers);
-router.route("/:id").delete(protect, authorize("admin"), deleteAccount, logout);
 
 module.exports = router;
