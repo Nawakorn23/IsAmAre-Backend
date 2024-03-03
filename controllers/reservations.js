@@ -121,7 +121,7 @@ exports.addReservation = async (req, res, next) => {
     }
 
     const reservation = await Reservation.create(req.body);
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       data: reservation,
     });
@@ -142,7 +142,7 @@ exports.updateReservation = async (req, res, next) => {
     let reservation = await Reservation.findById(req.params.id);
 
     let coworking = await Coworking.findById(reservation.coworking);
-    
+
     //const coworking = await Coworking.findById(req.params.coworkingId);
     if (!reservation) {
       return res.status(404).json({
@@ -183,12 +183,10 @@ exports.updateReservation = async (req, res, next) => {
       new: true,
       runValidators: true,
     });
-    
+
     res.status(200).json({
-      
       success: true,
       data: reservation,
-      
     });
   } catch (err) {
     console.log(err.stack);

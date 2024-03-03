@@ -11,17 +11,14 @@ exports.register = async (req, res, next) => {
 
     // Create user
     const user = await User.create({ name, email, telephone, password, role });
-
-    // Create token
-    // const token = user.getSignedJwtToken();
-    // res.status(200).json({ success: true, token });
-
-    sendTokenResponse(user, 200, res);
+    
+    sendTokenResponse(user, 201, res);
   } catch (err) {
     res.status(400).json({ success: false });
     console.log(err.stack);
   }
 };
+
 
 //desc    Login user
 //route   POST /api/project/auth/login
