@@ -220,3 +220,25 @@ exports.getAllUsers = async (req, res, next) => {
     });
   }
 };
+
+// @desc        Delete account user
+// @routes      DELETE /api/project/auth/delete
+// @access      Private
+exports.deleteMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: `Bootcamp not found with id of ${req.params.id}`,
+      });
+    }
+
+    await user.deleteOne();
+    res.status(200).json({ success: true, data: {} });
+    next();
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
+};

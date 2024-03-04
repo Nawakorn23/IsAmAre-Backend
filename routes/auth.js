@@ -7,6 +7,7 @@ const {
   logout,
   updateMe,
   getAllUsers,
+  deleteMe
 } = require("../controllers/auth");
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.get("/logout", logout);
 router.get("/me", protect, getMe);
 router.put("/updateMe", protect, updateMe);
 router.get("/getallusers", protect, authorize("admin"), getAllUsers);
+router.delete("/deleteMe", protect, authorize("user"), deleteMe);
 
 module.exports = router;

@@ -70,6 +70,7 @@ UserSchema.pre(
   async function (next) {
     console.log(`Reservations begin removed from user ${this._id}`);
     await this.model("Reservation").deleteMany({ user: this._id });
+    console.log('Remove successfully');
     next();
   }
 );
