@@ -116,7 +116,9 @@ exports.logout = async (req, res, next) => {
 exports.updateMe = async (req, res, next) => {
   try {
     if (req.body.role) {
-      return res.status(400).json({ success: false, message: "false jaaa" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Can not change role" });
     }
     const user = await User.findByIdAndUpdate(req.user.id, req.body, {
       new: true,
