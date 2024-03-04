@@ -6,7 +6,6 @@ const {
   getMe,
   logout,
   updateMe,
-  deleteAccount,
   getAllUsers,
 } = require("../controllers/auth");
 
