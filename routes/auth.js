@@ -20,6 +20,6 @@ router.get("/logout", logout);
 router.get("/me", protect, getMe);
 router.put("/updateMe", protect, updateMe);
 router.get("/getallusers", protect, authorize("admin"), getAllUsers);
-router.delete("/deleteMe", protect, authorize("user"), deleteMe);
+router.delete("/deleteMe", protect, deleteMe);
 
 module.exports = router;
