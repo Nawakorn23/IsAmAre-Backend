@@ -102,6 +102,7 @@ exports.addReservation = async (req, res, next) => {
       });
     }
 
+    //open-close time
     //const start = req.body.apptDate.split('T')[1].split('.')[0];
     if (
       req.body.start.localeCompare(coworking.opentime) < 0 ||

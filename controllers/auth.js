@@ -237,7 +237,6 @@ exports.deleteMe = async (req, res, next) => {
 
     await user.deleteOne();
     res.status(200).json({ success: true, data: {} });
-    next();
   } catch (err) {
     res.status(400).json({ success: false });
   }
